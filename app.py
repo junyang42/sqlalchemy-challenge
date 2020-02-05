@@ -102,12 +102,20 @@ def r4(start):
     session = Session(engine)
     
     # Query for prcp
-    results = session.query(func.max(Measurement.tobs),func.min(Measurement.tobs),func.avg(Measurement.tobs)).\
+    results = session.query(Measurement.date, Measurement.tobs).\
         filter(Measurement.date >= start).all()
 
     session.close()
     
-    return jsonify(results)
+    # Convert results to df
+    df = pd.DataFrame(results)
+    
+    results_dict = {
+        'max': df['tobs'].max(),
+        'min': df['tobs'].min(),
+        'avg': df['tobs'].mean()}
+    
+    return results_dict
 ###############################################################################
 @app.route("/api/v1.0/<start>/<end>")
 def r5(start, end):
@@ -116,13 +124,21 @@ def r5(start, end):
     session = Session(engine)
     
     # Query for prcp
-    results = session.query(func.max(Measurement.tobs),func.min(Measurement.tobs),func.avg(Measurement.tobs)).\
+    results = session.query(Measurement.date, Measurement.tobs).\
         filter(Measurement.date >= start).\
         filter(Measurement.date <= end).all()
 
     session.close()
     
-    return jsonify(results)
+    # Convert results to df
+    df = pd.DataFrame(results)
+    
+    results_dict = {
+        'max': df['tobs'].max(),
+        'min': df['tobs'].min(),
+        'avg': df['tobs'].mean()}
+    
+    return jsonify(results_dict)
 
 if __name__ == '__main__':
     app.run(debug=True)
